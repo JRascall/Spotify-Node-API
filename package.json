@@ -1,0 +1,29 @@
+{
+  "name": "spotify-client-api",
+  "version": "1.0.0",
+  "description": "Control the spotify client",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JRascall/SpotifyCommunity.git"
+  },
+  "keywords": [
+    "spotify",
+    "api",
+    "client",
+    "control"
+  ],
+  "author": "Jamie Mascall",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JRascall/SpotifyCommunity/issues"
+  },
+  "homepage": "https://github.com/JRascall/SpotifyCommunity#readme",
+  "dependencies": {
+    "request": "^2.81.0",
+    "vorpal": "^1.12.0"
+  }
+}
