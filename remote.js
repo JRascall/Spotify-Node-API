@@ -13,7 +13,7 @@ function Remote(){
         CSRFTOKEN: "simplecsrf/token.json?&ref=&cors=",
         OAUTH: "http://open.spotify.com/token",
         PLAYCURRENT: "remote/pause.json?pause=false",
-        PLAYMEW: "remote/play.json?uri={url}&context={context}",
+        PLAYNEW: "remote/play.json?uri={url}&context={context}",
         PAUSE: "remote/pause.json?pause=true"
     };
 
@@ -48,15 +48,24 @@ function Remote(){
         });
     }
 
-    this.PauseTrack = function() {
+    this.Pause = function() {
         that.CreateRequest({URL: that.URLS.PAUSE, OAUTH: true, CSRF: true}, function(res){
-            console.log("PAUSED");
+            that.emit('TrackPaused');
         });
     }
 
-    this.PlayTrack = function() {
-        that.CreateRequest({URL: that.URLS.PLAYCURRENT, OAUTH: true, CSRF: true}, function(res){
-            console.log("PLAY CURRENT");
+    this.Play = function(trackURL, context) {
+        var url = that.URLS.PLAYCURRENT;
+
+        if(trackURL && context)
+        {
+            url = that.URLS.PLAYNEW;
+            url = url.replace('{url}', trackURL);
+            url = url.replace('{context}', context);
+        }
+        console.log(url);
+        that.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
+            that.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
         });
     }
 
