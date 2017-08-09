@@ -63,7 +63,6 @@ function Remote(){
             url = url.replace('{url}', trackURL);
             url = url.replace('{context}', context);
         }
-        console.log(url);
         that.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
             that.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
         });
