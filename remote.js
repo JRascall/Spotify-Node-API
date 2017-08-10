@@ -70,11 +70,11 @@ class Remote extends EventsEmitter
        
         var url = this.URLS.PLAYCURRENT;
 
-        if(trackURL && context)
+        if(trackURL)
         {
             url = this.URLS.PLAYNEW;
             url = url.replace('{url}', trackURL);
-            url = url.replace('{context}', context);
+            url = url.replace('{context}', trackURL);
         }
         this.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
             self.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
@@ -83,8 +83,9 @@ class Remote extends EventsEmitter
 
     AddToQueue(trackURL) {
        const self = this;
-        this.CreateRequest({URL: this.URLS.QUEUE, OAUTH: true, CSRF: true}, function(res){
-            this.emit("QueuedSong");
+       var url = this.URLS.QUEUE.replace('{url}', trackURL);
+        this.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
+            self.emit("QueuedSong");
         })
     }
 

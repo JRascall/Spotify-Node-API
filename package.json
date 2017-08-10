@@ -24,6 +24,7 @@
   "homepage": "https://github.com/JRascall/SpotifyCommunity#readme",
   "dependencies": {
     "request": "^2.81.0",
+    "restify": "^5.0.1",
     "vorpal": "^1.12.0"
   }
 }

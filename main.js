@@ -4,14 +4,18 @@ const ReadLine = require('readline');
 
 const Remote = require('./remote.js');
 const WebAPI = require('./webapi.js');
+const APIServer = require('./apiserver.js');
 
 var remote = new Remote();
 var webAPI = new WebAPI();
+var server = new APIServer(remote, webAPI);
 
 //webAPI.Search("yelawolf");
 
 remote.on('Ready', function(){
     console.log("LOCALAPI-Ready");
+
+    remote.Play("spotify:track:4FxkQzIhsLAkuiqX5puvU6", "spotify:track:4FxkQzIhsLAkuiqX5puvU6");
 });
 
 remote.on('TrackPlayedNew', function(){
@@ -25,7 +29,6 @@ remote.on('TrackPlayedCurrent', function(){
 remote.on('TrackPaused', function(){
     console.log("Song Paused");
 });
-
 
 var RL = ReadLine.createInterface({
     input: process.stdin,

@@ -27,7 +27,7 @@ class WebAPI extends EventsEmitter
     Search(q){
         const self = this;
         this.CreateRequest({URL: "search?q=" + q + "&type=album,artist,playlist,track"}, function(data){
-            console.log(data);
+            return data;
         });
     }
 
