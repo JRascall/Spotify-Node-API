@@ -16,14 +16,25 @@ class APIServer extends EventsEmitter
 
         this.RestifyServer.listen(8005);
 
-        this.RestifyServer.post("/Play", function(req, res){
+        this.RestifyServer.get("/play", function(req, res){
             self.Remote.Play();
             res.send(200, {status: 200});
         });
 
-        this.RestifyServer.post("/Pause", function(req, res){
+        this.RestifyServer.get("/play/:url", function(req, res){
+            self.Remote.Play(req.params.url);
+            res.send(200, {status: 200});
+        });
+
+        this.RestifyServer.get("/pause", function(req, res){
             self.Remote.Pause();
             res.send(200, {status: 200});
+        });
+
+        this.RestifyServer.get("/search/:searchQuery", function(req, res){
+            self.WebAPI.Search(req.params.searchQuery, function(data){
+                res.send(200, data);
+            });
         });
 
     }

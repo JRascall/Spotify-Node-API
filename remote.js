@@ -14,7 +14,8 @@ class Remote extends EventsEmitter
             PLAYCURRENT: "remote/pause.json?pause=false",
             PLAYNEW: "remote/play.json?uri={url}&context={context}",
             PAUSE: "remote/pause.json?pause=true",
-            QUEUE: "remote/play.json?url={url}?action=queue"
+            QUEUE: "remote/play.json?url={url}&action=queue",
+            STATUS: "remote/status.json?test=test"
         };
 
         this.on('OAuthComplete', function(oauthKey){
@@ -65,7 +66,7 @@ class Remote extends EventsEmitter
         });
     }
 
-    Play(trackURL, context) {
+    Play(trackURL) {
        const self = this;
        
         var url = this.URLS.PLAYCURRENT;
@@ -81,13 +82,22 @@ class Remote extends EventsEmitter
         });
     }
 
-    AddToQueue(trackURL) {
+    GetStatus(){
+        const self = this;
+        
+        this.CreateRequest({URL: this.URLS.STATUS, OAUTH: true, CSRF: true}, function(res){
+            self.emit("Status", res);
+        });
+    }
+
+    //Doesn't work
+    /*AddToQueue(trackURL) {
        const self = this;
        var url = this.URLS.QUEUE.replace('{url}', trackURL);
         this.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
             self.emit("QueuedSong");
         })
-    }
+    }*/
 
     CreateRequest(options, cb) {
         var defaultOptions = { 
@@ -112,7 +122,7 @@ class Remote extends EventsEmitter
 
         if(options.OAUTH) defaultOptions.url += "&oauth=" + this.OAuthKey;
         if(options.CSRF) defaultOptions.url += "&csrf=" + this.CSRFKey;
-
+        console.log(defaultOptions.url);
         var request = new Request(defaultOptions,  function(err, res, body){
                 if(err) console.log(err);
                 body = JSON.parse(body);

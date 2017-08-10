@@ -10,12 +10,14 @@ var remote = new Remote();
 var webAPI = new WebAPI();
 var server = new APIServer(remote, webAPI);
 
-//webAPI.Search("yelawolf");
+/*webAPI.Search("yelawolf", function(data){
+
+});*/
+
 
 remote.on('Ready', function(){
     console.log("LOCALAPI-Ready");
-
-    remote.Play("spotify:track:4FxkQzIhsLAkuiqX5puvU6", "spotify:track:4FxkQzIhsLAkuiqX5puvU6");
+    remote.GetStatus();
 });
 
 remote.on('TrackPlayedNew', function(){
@@ -28,6 +30,10 @@ remote.on('TrackPlayedCurrent', function(){
 
 remote.on('TrackPaused', function(){
     console.log("Song Paused");
+});
+
+remote.on('Status', function(data){
+    console.log(data);
 });
 
 var RL = ReadLine.createInterface({
