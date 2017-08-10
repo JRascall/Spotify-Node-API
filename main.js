@@ -1,16 +1,17 @@
 "use strict";
 
+const ReadLine = require('readline');
+
 const Remote = require('./remote.js');
 const WebAPI = require('./webapi.js');
 
 var remote = new Remote();
 var webAPI = new WebAPI();
 
-webAPI.Search("yelawolf");
+//webAPI.Search("yelawolf");
 
 remote.on('Ready', function(){
     console.log("LOCALAPI-Ready");
-    remote.Pause();
 });
 
 remote.on('TrackPlayedNew', function(){
@@ -25,4 +26,19 @@ remote.on('TrackPaused', function(){
     console.log("Song Paused");
 });
 
-process.stdin.resume();
+
+var RL = ReadLine.createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+
+RL.on('line', function(input){
+    switch(input){
+        case "Play":
+            remote.Play();
+        break;
+        case "Pause":
+            remote.Pause();
+        break;
+    }
+})

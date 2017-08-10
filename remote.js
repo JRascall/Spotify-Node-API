@@ -14,7 +14,8 @@ function Remote(){
         OAUTH: "http://open.spotify.com/token",
         PLAYCURRENT: "remote/pause.json?pause=false",
         PLAYNEW: "remote/play.json?uri={url}&context={context}",
-        PAUSE: "remote/pause.json?pause=true"
+        PAUSE: "remote/pause.json?pause=true",
+        QUEUE: "remote/play.json?url={url}?action=queue"
     };
 
     this.on('OAuthComplete', function(oauthKey){
@@ -66,6 +67,12 @@ function Remote(){
         that.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
             that.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
         });
+    }
+
+    this.AddToQueue = function(trackURL) {
+        that.CreateRequest({URL: that.URLS.QUEUE, OAUTH: true, CSRF: true}, function(res){
+            that.emit("QueuedSong");
+        })
     }
 
     this.CreateRequest = function(options, cb) {

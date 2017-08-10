@@ -8,6 +8,14 @@ function WebAPI(){
     var that = this;
 
     this.Token = null;
+    this.URLS = {
+        TRACKS: {
+            GET: "tracks/"
+        },
+        SEARCH: {
+            
+        }
+    };
 
     this.GetTrack = function(trackId) {
         that.CreateRequest("tracks/" + trackId, function(data){
