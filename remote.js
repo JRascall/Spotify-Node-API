@@ -2,81 +2,93 @@
 const Request = require('request');
 const EventsEmitter = require('events');
 
-module.exports = Remote;
+class Remote extends EventsEmitter
+{
+    constructor() {
+        super();
+        this.OAuthKey = null;
+        this.CSRFKey = null;
+        this.URLS = {
+            CSRFTOKEN: "simplecsrf/token.json?&ref=&cors=",
+            OAUTH: "http://open.spotify.com/token",
+            PLAYCURRENT: "remote/pause.json?pause=false",
+            PLAYNEW: "remote/play.json?uri={url}&context={context}",
+            PAUSE: "remote/pause.json?pause=true",
+            QUEUE: "remote/play.json?url={url}?action=queue"
+        };
 
-function Remote(){
-    var that = this;
+        this.on('OAuthComplete', function(oauthKey){
+            this.OAuthKey = oauthKey;
+            this.IsLoaded();
+        });
 
-    this.OAuthKey = null;
-    this.CSRFKey = null;
-    this.URLS = {
-        CSRFTOKEN: "simplecsrf/token.json?&ref=&cors=",
-        OAUTH: "http://open.spotify.com/token",
-        PLAYCURRENT: "remote/pause.json?pause=false",
-        PLAYNEW: "remote/play.json?uri={url}&context={context}",
-        PAUSE: "remote/pause.json?pause=true",
-        QUEUE: "remote/play.json?url={url}?action=queue"
-    };
+        this.on('CSRFComplete', function(csrfKey){
+            this.CSRFKey = csrfKey;
+            this.IsLoaded();
+        });
 
-    this.on('OAuthComplete', function(oauthKey){
-        that.OAuthKey = oauthKey;
-        that.IsLoaded();
-    });
-
-    this.on('CSRFComplete', function(csrfKey){
-        that.CSRFKey = csrfKey;
-        that.IsLoaded();
-    });
-
-    this.IsLoaded = function(){
-        if(that.OAuthKey && that.CSRFKey) that.emit('Ready');
+        this.GetOAuthKey();
+        this.GetCSRFToken();
+    }
+   
+   
+    IsLoaded(){
+        if(this.OAuthKey && this.CSRFKey) this.emit('Ready');
     }
 
-    this.GetOAuthKey = function() {
-        that.CreateRequest({URL: "", OverrideURL: that.URLS.OAUTH}, function(res){
-            that.emit('OAuthComplete', res['t']);
+    GetOAuthKey(){
+        const self = this;
+
+        this.CreateRequest({URL: "", OverrideURL: this.URLS.OAUTH}, function(res){
+            self.emit('OAuthComplete', res['t']);
         });
     }
 
-    this.GetCSRFToken = function() {
+    GetCSRFToken() {
+       const self = this;
+
         var extraheaders = {
             'Origin': 'https://embed.spotify.com',
             'Referer': 'https://embed.spotify.com/?uri=spotify:track:4bz7uB4edifWKJXSDxwHcs'
         }
 
-        that.CreateRequest({ URL:that.URLS.CSRFTOKEN, ExtraHeader: extraheaders}, function(res){
-            that.emit('CSRFComplete', res['token']);
+        this.CreateRequest({ URL:this.URLS.CSRFTOKEN, ExtraHeader: extraheaders}, function(res){
+            self.emit('CSRFComplete', res['token']);
         });
     }
 
-    this.Pause = function() {
-        that.CreateRequest({URL: that.URLS.PAUSE, OAUTH: true, CSRF: true}, function(res){
-            that.emit('TrackPaused');
+    Pause() {
+        const self = this;
+
+        this.CreateRequest({URL: this.URLS.PAUSE, OAUTH: true, CSRF: true}, function(res){
+            self.emit('TrackPaused');
         });
     }
 
-    this.Play = function(trackURL, context) {
-        var url = that.URLS.PLAYCURRENT;
+    Play(trackURL, context) {
+       const self = this;
+       
+        var url = this.URLS.PLAYCURRENT;
 
         if(trackURL && context)
         {
-            url = that.URLS.PLAYNEW;
+            url = this.URLS.PLAYNEW;
             url = url.replace('{url}', trackURL);
             url = url.replace('{context}', context);
         }
-        that.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
-            that.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
+        this.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
+            self.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
         });
     }
 
-    this.AddToQueue = function(trackURL) {
-        that.CreateRequest({URL: that.URLS.QUEUE, OAUTH: true, CSRF: true}, function(res){
-            that.emit("QueuedSong");
+    AddToQueue(trackURL) {
+       const self = this;
+        this.CreateRequest({URL: this.URLS.QUEUE, OAUTH: true, CSRF: true}, function(res){
+            this.emit("QueuedSong");
         })
     }
 
-    this.CreateRequest = function(options, cb) {
-        
+    CreateRequest(options, cb) {
         var defaultOptions = { 
             url: "https://tpcaahshvs.spotilocal.com:4371/" + options.URL,
             headers: {
@@ -97,8 +109,8 @@ function Remote(){
             }
         }
 
-        if(options.OAUTH) defaultOptions.url += "&oauth=" + that.OAuthKey;
-        if(options.CSRF) defaultOptions.url += "&csrf=" + that.CSRFKey;
+        if(options.OAUTH) defaultOptions.url += "&oauth=" + this.OAuthKey;
+        if(options.CSRF) defaultOptions.url += "&csrf=" + this.CSRFKey;
 
         var request = new Request(defaultOptions,  function(err, res, body){
                 if(err) console.log(err);
@@ -106,9 +118,6 @@ function Remote(){
                 cb(body);
         });
     }
-
-    this.GetOAuthKey();
-    this.GetCSRFToken();
 }
 
-Remote.prototype.__proto__ = EventsEmitter.prototype;
+module.exports = Remote;
