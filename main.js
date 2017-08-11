@@ -10,29 +10,23 @@ var remote = new Remote();
 var webAPI = new WebAPI();
 var server = new APIServer(remote, webAPI);
 
-/*webAPI.Search("yelawolf", function(data){
-
-});*/
-
-
-remote.on('Ready', function(){
+remote.on('Ready', function () {
     console.log("LOCALAPI-Ready");
-    remote.GetStatus();
 });
 
-remote.on('TrackPlayedNew', function(){
+remote.on('TrackPlayedNew', function () {
     console.log("New Song Played");
 });
 
-remote.on('TrackPlayedCurrent', function(){
+remote.on('TrackPlayedCurrent', function () {
     console.log("Song resumed");
 });
 
-remote.on('TrackPaused', function(){
+remote.on('TrackPaused', function () {
     console.log("Song Paused");
 });
 
-remote.on('Status', function(data){
+remote.on('Status', function (data) {
     console.log(data);
 });
 
@@ -41,13 +35,13 @@ var RL = ReadLine.createInterface({
     output: process.stdout
 })
 
-RL.on('line', function(input){
-    switch(input){
+RL.on('line', function (input) {
+    switch (input) {
         case "Play":
             remote.Play();
-        break;
+            break;
         case "Pause":
             remote.Pause();
-        break;
+            break;
     }
 })

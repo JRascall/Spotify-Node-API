@@ -2,8 +2,7 @@
 const Request = require('request');
 const EventsEmitter = require('events');
 
-class Remote extends EventsEmitter
-{
+class Remote extends EventsEmitter {
     constructor() {
         super();
         this.OAuthKey = null;
@@ -18,12 +17,12 @@ class Remote extends EventsEmitter
             STATUS: "remote/status.json?test=test"
         };
 
-        this.on('OAuthComplete', function(oauthKey){
+        this.on('OAuthComplete', function (oauthKey) {
             this.OAuthKey = oauthKey;
             this.IsLoaded();
         });
 
-        this.on('CSRFComplete', function(csrfKey){
+        this.on('CSRFComplete', function (csrfKey) {
             this.CSRFKey = csrfKey;
             this.IsLoaded();
         });
@@ -31,29 +30,29 @@ class Remote extends EventsEmitter
         this.GetOAuthKey();
         this.GetCSRFToken();
     }
-   
-   
-    IsLoaded(){
-        if(this.OAuthKey && this.CSRFKey) this.emit('Ready');
+
+
+    IsLoaded() {
+        if (this.OAuthKey && this.CSRFKey) this.emit('Ready');
     }
 
-    GetOAuthKey(){
+    GetOAuthKey() {
         const self = this;
 
-        this.CreateRequest({URL: "", OverrideURL: this.URLS.OAUTH}, function(res){
+        this.CreateRequest({ URL: "", OverrideURL: this.URLS.OAUTH }, function (res) {
             self.emit('OAuthComplete', res['t']);
         });
     }
 
     GetCSRFToken() {
-       const self = this;
+        const self = this;
 
         var extraheaders = {
             'Origin': 'https://embed.spotify.com',
             'Referer': 'https://embed.spotify.com/?uri=spotify:track:4bz7uB4edifWKJXSDxwHcs'
         }
 
-        this.CreateRequest({ URL:this.URLS.CSRFTOKEN, ExtraHeader: extraheaders}, function(res){
+        this.CreateRequest({ URL: this.URLS.CSRFTOKEN, ExtraHeader: extraheaders }, function (res) {
             self.emit('CSRFComplete', res['token']);
         });
     }
@@ -61,31 +60,30 @@ class Remote extends EventsEmitter
     Pause() {
         const self = this;
 
-        this.CreateRequest({URL: this.URLS.PAUSE, OAUTH: true, CSRF: true}, function(res){
+        this.CreateRequest({ URL: this.URLS.PAUSE, OAUTH: true, CSRF: true }, function (res) {
             self.emit('TrackPaused');
         });
     }
 
     Play(trackURL) {
-       const self = this;
-       
+        const self = this;
+
         var url = this.URLS.PLAYCURRENT;
 
-        if(trackURL)
-        {
+        if (trackURL) {
             url = this.URLS.PLAYNEW;
             url = url.replace('{url}', trackURL);
             url = url.replace('{context}', trackURL);
         }
-        this.CreateRequest({URL: url, OAUTH: true, CSRF: true}, function(res){
+        this.CreateRequest({ URL: url, OAUTH: true, CSRF: true }, function (res) {
             self.emit(trackURL ? "TrackPlayedNew" : "TrackPlayedCurrent");
         });
     }
 
-    GetStatus(){
+    GetStatus() {
         const self = this;
-        
-        this.CreateRequest({URL: this.URLS.STATUS, OAUTH: true, CSRF: true}, function(res){
+
+        this.CreateRequest({ URL: this.URLS.STATUS, OAUTH: true, CSRF: true }, function (res) {
             self.emit("Status", res);
         });
     }
@@ -100,7 +98,7 @@ class Remote extends EventsEmitter
     }*/
 
     CreateRequest(options, cb) {
-        var defaultOptions = { 
+        var defaultOptions = {
             url: "https://tpcaahshvs.spotilocal.com:4371/" + options.URL,
             headers: {
                 'Pragma': 'no-cache',
@@ -112,21 +110,19 @@ class Remote extends EventsEmitter
             }
         };
 
-        if(options.OverrideURL) defaultOptions.url = options.OverrideURL;
-        if(options.ExtraHeader) {
-            for(var key in options.ExtraHeader)
-            {
+        if (options.OverrideURL) defaultOptions.url = options.OverrideURL;
+        if (options.ExtraHeader) {
+            for (var key in options.ExtraHeader) {
                 defaultOptions.headers[key] = options.ExtraHeader[key];
             }
         }
 
-        if(options.OAUTH) defaultOptions.url += "&oauth=" + this.OAuthKey;
-        if(options.CSRF) defaultOptions.url += "&csrf=" + this.CSRFKey;
-        console.log(defaultOptions.url);
-        var request = new Request(defaultOptions,  function(err, res, body){
-                if(err) console.log(err);
-                body = JSON.parse(body);
-                cb(body);
+        if (options.OAUTH) defaultOptions.url += "&oauth=" + this.OAuthKey;
+        if (options.CSRF) defaultOptions.url += "&csrf=" + this.CSRFKey;
+        var request = new Request(defaultOptions, function (err, res, body) {
+            if (err) console.log(err);
+            body = JSON.parse(body);
+            cb(body);
         });
     }
 }
