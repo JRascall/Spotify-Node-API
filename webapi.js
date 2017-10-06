@@ -47,7 +47,7 @@ class WebAPI extends EventsEmitter {
 
     GetOAuthToken(cb) {
         const self = this;
-        var auth = "Basic " + new Buffer('8217b40df2604420abe3610819932559' + ":" + '325419217cae40db91a9830f541083c1').toString("base64");
+        var auth = "Basic " + new Buffer({replace} + ":" + {replace}).toString("base64");
         var request = new Request.post("https://accounts.spotify.com/api/token", {
             body: 'grant_type=client_credentials',
             headers: {
